@@ -7,12 +7,15 @@ use Illuminate\Support\Facades\Http;
 
 class PendaftaranFrontendController extends Controller
 {
-    // 1. Menampilkan daftar pendaftaran (GET)
+    // 1. Menampilkan daftar pendaftaran (GET) - Urutkan data terbaru di atas
     public function index()
     {
         // Mengambil data dari API Project A
         $response = Http::get(env('API_BASE_URL') . '/pendaftaran-osis');
-        $pendaftarans = $response->successful() ? $response->json()['data'] ?? [] : [];
+        $rawPendaftarans = $response->successful() ? $response->json()['data'] ?? [] : [];
+
+        // Mengurutkan data agar ID terbesar / data terbaru berada di posisi paling atas
+        $pendaftarans = collect($rawPendaftarans)->sortByDesc('id')->values()->all();
 
         return view('pendaftaran.index', compact('pendaftarans'));
     }
